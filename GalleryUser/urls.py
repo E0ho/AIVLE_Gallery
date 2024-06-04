@@ -23,5 +23,5 @@ urlpatterns = [
     path('login/', views.gallery_login),
     path('join/', views.join),
     path('profile/', views.user_profile),
-
+    path('profile/update', views.user_profile_update),
 ]

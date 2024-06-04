@@ -5,12 +5,14 @@
     {% load static %}
     <link type="text/css" href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
     <title>Join</title>
+    {% load socialaccount %}
+    {% providers_media_js %}
 </head>
 <body>
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">z`
+            <div class="card">
                 <div class="card-header">
                     <h3 class="text-center">Join</h3>
                 </div>
@@ -34,8 +36,16 @@
                             <input type="text" class="form-control" id="e_mail" name="e_mail" placeholder="이름을 입력하세요">
                         </div>
                         <button type="submit" class="btn btn-primary">가입하기</button>
-                        <button type="button" class="btn btn-danger" onclick="window.location.href = '/'">취소</button>
+                        <button type="button" class="btn btn-danger" onclick="window.location.href = '/gallery'">취소</button>
                     </form>
+                    <br>
+                        <hr>
+                        <div class="text-center">
+                            <p class="text-secondary small">간단 회원가입</p>
+                            <a href="{% provider_login_url 'google' %}">
+                                <img src="/static/img/web_light_rd_na@2x.png" alt="구글" width="50px" height="50px"/>
+                            </a>
+                        </div>
                 </div>
             </div>
         </div>

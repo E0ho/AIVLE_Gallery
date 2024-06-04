@@ -4,16 +4,36 @@
     {% load static %}
     <meta charset="UTF-8">
     <link type="text/css" href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Detail</title>
     <style>
+        body {
+            background-color: #f7f8fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .card-header, .card-body, .card-footer {
+            padding: 20px;
+        }
+        .card-header {
+            background-color: lightgray;
+            color: black;
+        }
         .card-text img {
             display: block;
             margin: 0 auto;
             max-width: 100%;
             height: auto;
+            border-radius: 10px;
         }
         .comment-list {
             list-style-type: none;
@@ -21,7 +41,7 @@
         }
         .comment-list li {
             border-bottom: 1px solid #ddd;
-            padding: 8px 0;
+            padding: 10px 0;
         }
         .likes-info {
             display: flex;
@@ -35,11 +55,52 @@
             width: 100%;
             margin-bottom: 10px;
         }
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        .comment-list small {
+            margin-right: 10px;
+        }
+        .btn-primary, .btn-secondary, .btn-danger, .btn-info {
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        .love-button {
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+        }
+        .love-button img {
+            width: 30px;
+            height: 30px;
+        }
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .alert-auto-dismissible {
+            animation: fadeOut 5s forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
     </style>
 </head>
 <body>
 <div class="container my-5">
-    <h2 class="border-bottom py-3">{{ picture.title }}</h2>
+    <h2 class="border-bottom py-3 text-center">{{ picture.title }}</h2>
     <div class="card my-4">
         <div class="card-body">
             <div class="card-text mb-4">
@@ -52,12 +113,22 @@
                     <span class="badge bg-light text-dark">{{ picture.created_at }}</span>
                 </div>
                 <div class="likes-info">
-                    <img src="{% static 'images/likes_button.png' %}" alt="likes button image" width="30" height="30"/>
+                    <form class="comment-form" action="{% url 'gallery:create_love' picture.picture_id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="love-button">
+                            <img src="{% static 'images/likes_button.png' %}" alt="likes button image"/>
+                        </button>
+                    </form>
                     <span>좋아요: {{ picture.love_set.count }}</span>
-                    <a href="{% url 'gallery:update' picture.picture_id %}">[수정하기]</a>
-                    <a href="{% url 'gallery:update' picture.picture_id %}">[삭제하기]</a>
                 </div>
             </div>
+        </div>
+        <div class="card-footer">
+            <div>
+                <a href="{% url 'gallery:update' picture.picture_id %}" class="btn btn-secondary btn-sm">수정하기</a>
+                <a href="{% url 'gallery:delete' picture.picture_id %}" class="btn btn-danger btn-sm">삭제하기</a>
+            </div>
+            <a href="{% url 'gallery:index' %}" class="btn btn-info btn-sm">목록보기</a>
         </div>
     </div>
 </div>
@@ -65,14 +136,22 @@
 <!-- 댓글 -->
 <div class="container my-5">
     <div class="card">
+        <div class="card-header">
+            <span>{{ picture.comment_set.count }}개의 댓글이 있습니다.</span>
+        </div>
         <div class="card-body">
-            <h5 class="mb-4">{{ picture.comment_set.count }}개의 댓글이 있습니다.</h5>
             <ul class="comment-list">
-            {% for comment in picture.comment_set.all %}
-                <li>{{ comment.content }}</li>
-            {% endfor %}
+                {% for comment in picture.comment_set.all %}
+                    <li>
+                        <span>{{ comment.content }}</span>
+                        <div class="mt-2">
+                            <small><a href="#">[댓글 수정]</a></small>
+                            <small><a href="{% url 'gallery:delete_comment' picture.picture_id comment.comment_id  %}">[댓글 삭제]</a></small>
+                        </div>
+                    </li>
+                {% endfor %}
             </ul>
-            <form class="comment-form" action="{% url 'gallery:create_comment' picture.picture_id %}" method="post">
+            <form class="comment-form mt-4" action="{% url 'gallery:create_comment' picture.picture_id %}" method="post">
                 {% csrf_token %}
                 <textarea name="content" id="content" rows="5" class="form-control mb-3" placeholder="댓글을 입력하세요"></textarea>
                 <button type="submit" class="btn btn-primary">댓글 입력</button>
@@ -80,7 +159,14 @@
         </div>
     </div>
 </div>
-
+{% for message in messages %}
+    <div class="alert {{ message.tags }} alert-auto-dismissible alert-dismissible notification-container text-center" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message }}
+    </div>
+{% endfor %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"></script>
 </body>
 </html>

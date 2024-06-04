@@ -7,23 +7,23 @@ from django.utils import timezone
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, username,  e_mail, password=None):
+    def create_user(self, username,  email, password=None):
         if not username:
             raise ValueError('The username must be set')
 
         user = self.model(
             username=username,
-            e_mail=e_mail,
+            email=email,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password, e_mail):
+    def create_superuser(self, username, password, email):
         user = self.create_user(
             username=username,
             password=password,
-            e_mail=e_mail,
+            email=email,
         )
         user.is_superuser = True
         user.save(using=self._db)
@@ -35,16 +35,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     password = models.CharField(db_column='PW', max_length=200)  # Field name made lowercase.
     last_login = models.DateTimeField(blank=True, null=True, default=timezone.now)
     is_superuser = models.IntegerField(blank=True, null=True, default=False)
-    e_mail = models.CharField(max_length=320, blank=True, null=True)
+    email = models.CharField( db_column='e_mail', max_length=320, blank=True, null=True)
     is_active = models.IntegerField(blank=True, null=True, default=True)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['e_mail']
+    REQUIRED_FIELDS = ['email']
 
     class Meta:
         db_table = 'user'
+        managed=False
 
     @property
     def is_staff(self):

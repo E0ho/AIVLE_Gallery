@@ -3,4 +3,4 @@ from .models import *
 
 admin.site.register(Picture)
 admin.site.register(Comment)
-# Register your models here.
+admin.site.register(Love)

@@ -64,16 +64,24 @@
 <body>
     <div class="container">
         <h1>새로운 이미지 등록</h1>
-        <form action="{% url 'gallery:create' %}", enctype="multipart/form-data", method="post">
+<!--        <form action="{% url 'gallery:create' %}", method="post" enctype="multipart/form-data">-->
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <label for="title">제목:</label>
-            <input type="text" id="title" name="title" maxlength="200" required>
+            {{ form.as_p }}
+<!--            <label for="title">제목:</label>-->
+<!--            <input type="text" id="title" name="title" maxlength="200" required>-->
 
-            <label for="image">이미지:</label>
-            <input type="file" id="image" name="image", accept="imgae/*", required>
+<!--            <label for="image">이미지:</label>-->
+<!--            <input type="file" id="image" name="image" required>-->
 
-            <label for="content">내용:</label>
-            <textarea id="content" name="content" required></textarea>
+<!--            <label for="content">내용:</label>-->
+<!--            <textarea id="content" name="content" required></textarea>-->
+
+<!--            <label for="created_at">등록 일자:</label>-->
+<!--            <input type="datetime-local" id="created_at" name="created_at" required>-->
+
+<!--            <label for="user_id">작성자:</label>-->
+<!--            <input type="text" id="user_id" name="user_id" maxlength="200" required>-->
 
             <button type="submit">업로드</button>
         </form>

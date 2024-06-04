@@ -5,6 +5,8 @@
     {% load static %}
     <link type="text/css" href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
     <title>Login</title>
+    {% load socialaccount %}
+    {% providers_media_js %}
 </head>
 <body>
 <div class="container">
@@ -34,10 +36,29 @@
                                 <input name="password" type="password" class="form-control" id="password"
                                        placeholder="비밀번호를 입력하세요">
                             </div>
-                            <button type="submit" class="btn btn-primary">로그인</button>
-                            <button type="button" class="btn btn-danger" onclick="window.location.href = '/'">취소
-                            </button>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary m-3">로그인</button>
+                                <button type="button" class="btn btn-success m-3"
+                                        onclick="window.location.href = '/auth/join'">회원가입
+                                </button>
+                                <button type="button" class="btn btn-danger m-3"
+                                        onclick="window.location.href = '/gallery'">취소
+                                </button>
+                            </div>
                         </form>
+                        <br>
+                        <hr>
+                        <div class="text-center">
+                            <p class="text-secondary small">간단 로그인</p>
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'account_logout' %}?next=/auth/login">로그아웃</a>
+                            {{ user.username }} 님이 활동중
+                            {% else %}
+                            <a href="{% provider_login_url 'google' %}">
+                                <img src="/static/img/web_light_rd_na@2x.png" alt="구글" width="50px" height="50px"/>
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

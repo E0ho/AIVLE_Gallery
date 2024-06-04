@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link type="text/css" href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+    <title>Login</title>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Login</h3>
+        </div>
+
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="now_username">현재 ID</label>
+                    {% if user.is_authenticated %}
+                    <input name="now_username" type="text" class="form-control" id="now_username"
+                           value="{{ user.username }}" readonly>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="username">변경 ID</label>
+                    {% if user.is_authenticated %}
+                    <input name="username" type="text" class="form-control" id="username" value="{{ user.username }}">
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">E-mail</label>
+                    {% if user.is_authenticated %}
+                    <input type="email" class="form-control" id="userEmail" value="{{ user.email }}" readonly>
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="d-flex justify-content-end ">
+                    <button type="submit" class="btn btn-primary m-3">확인</button>
+                    <button type="button" class="btn btn-danger m-3"
+                            onclick="window.location.href = '/auth/profile'">취소
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -27,9 +27,9 @@ def gallery_login(request):
         if user is not None:
             login(request, user)
             print(user, "Login", timezone.now)
-            return redirect("gallery/")
+            return redirect("/gallery")
 
-        return redirect("/")
+        return redirect("/gallery")
 
 
 @csrf_exempt
@@ -52,7 +52,7 @@ def join(request):
         if password != confirmPassword:
             return redirect('/auth/join')
 
-        user = User.objects.create_user(username=username, password=password, e_mail=e_mail)
+        user = User.objects.create_user(username=username, password=password, email=e_mail)
 
         return redirect('/auth/login')
 
@@ -64,3 +64,22 @@ def user_profile(request):
     context = {'user': user}
 
     return render(request, "profile.html", context)
+
+@login_required()
+@csrf_exempt
+def user_profile_update(request):
+    if request.method == "GET":
+        user = request.user
+        context = {'user': user}
+        return render(request, "profile_update.html", context)
+
+    elif request.method =="POST":
+
+        change_username = request.POST['username']
+        now_username = request.POST['now_username']
+        user = get_object_or_404(User, pk=str(now_username))
+        user.username = change_username
+        user.save()
+
+        return redirect('/auth/profile')
+
