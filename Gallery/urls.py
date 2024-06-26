@@ -13,7 +13,8 @@ urlpatterns = [
 
     # Comment 관련 URL
     path('<int:picture_id>/create_comment/', views.create_comment, name='create_comment'),                     # 댓글 생성
-    path('/<int:picture_id>/<int:comment_id>/delete_comment/', views.delete_comment, name='delete_comment'),   # 댓글 삭제
+    path('<int:picture_id>/<int:comment_id>/update_comment/', views.update_comment, name='update_comment'),    # 댓글 수정
+    path('<int:picture_id>/<int:comment_id>/delete_comment/', views.delete_comment, name='delete_comment'),    # 댓글 삭제
 
     # Love 관련 URL
     path('<int:picture_id>/create_love/', views.create_love, name='create_love'),     # 좋아요 (추가 <-> 제거)
@@ -27,7 +28,7 @@ urlpatterns = [
 
 
     path('new_register/', views.new_register, name='new_register'),
-    path('create/', views.create, name='create'),
+    # path('create/', views.create, name='create'),
     path('search/', views.search, name='search'),
 ]
 
