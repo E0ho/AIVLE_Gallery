@@ -95,8 +95,16 @@ def delete_comment(request, comment_id, picture_id):
 
 def update_comment(request, comment_id, picture_id):
     comment = get_object_or_404(Comment, pk=comment_id)
+    picture = get_object_or_404(Picture, picture_id=picture_id)
+    image_data = base64.b64encode(picture.image).decode()
     if request.user == comment.user_id:
-        pass
+        if request.method == 'POST':
+            comment.content = request.POST.get('content')
+            comment.save()
+            return redirect('gallery:detail', picture_id=picture_id)
+        else:
+            return render(request, "update_comment.html",
+                          {"picture": picture, 'img': image_data, 'comment': comment})
     else:
         messages.warning(request, "권한이 없습니다.")
         return redirect('gallery:detail', picture_id=picture_id)

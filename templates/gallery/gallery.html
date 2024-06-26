@@ -125,14 +125,14 @@
         <nav class="nav">
             <ol>
               {% if not user_logged_in %}  
-                <li><a href="#">로그인</a></li>
-                <li ><a href="#">회원 가입</a></li>
+                <li><a href="/auth/login">로그인</a></li>
+                <li ><a href="/auth/join">회원 가입</a></li>
               {% endif %}
             
               
-              {% if user_logged_in %}  
+              {% if user_logged_in %}
                 <li><a href="#">로그아웃</a></li>
-                <li><a href="#">My Page</a></li>
+                <li><a href="/auth/profile">My Page</a></li>
               {% endif %}
               
             </ol>

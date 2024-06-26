@@ -145,8 +145,8 @@
                     <li>
                         <span>{{ comment.content }}</span>
                         <div class="mt-2">
-                            <small><a href="#">[댓글 수정]</a></small>
-                            <small><a href="{% url 'gallery:delete_comment' picture.picture_id comment.comment_id  %}">[댓글 삭제]</a></small>
+                            <small><a href="{% url 'gallery:update_comment' picture.picture_id comment.comment_id %}">[댓글 수정]</a></small>
+                            <small><a href="{% url 'gallery:delete_comment' picture.picture_id comment.comment_id %}">[댓글 삭제]</a></small>
                         </div>
                     </li>
                 {% endfor %}
@@ -159,6 +159,8 @@
         </div>
     </div>
 </div>
+
+<!--메시지 출력-->
 {% for message in messages %}
     <div class="alert {{ message.tags }} alert-auto-dismissible alert-dismissible notification-container text-center" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -167,6 +169,7 @@
         {{ message }}
     </div>
 {% endfor %}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"></script>
 </body>
 </html>

@@ -25,6 +25,7 @@ urlpatterns = [
     path('', views.gallery_list, name='index'),
     path('<int:picture_id>/', views.detail, name='detail'),
     path('comment/create/<int:picture_id>/', views.create_comment, name='create_comment'),
+    path('comment/update/<int:picture_id>/<int:comment_id>', views.update_comment, name='update_comment'),
     path('comment/delete/<int:picture_id>/<int:comment_id>/', views.delete_comment, name='delete_comment'),
     path('love/create/<int:picture_id>/', views.create_love, name='create_love'),
     path('<int:picture_id>/update/', views.update_post, name='update'),
