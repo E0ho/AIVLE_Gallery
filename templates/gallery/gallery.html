@@ -1,3 +1,4 @@
+{% load filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,12 +157,15 @@
                         <td>{{ gallery.created_at|date:"Y-m-d" }}</td>
                         <td><a>{{ gallery.title }}</a></td>
                         <td>{{ gallery.user_id }}</td>
-                        <td><a href="{{ gallery.picture_id }}"><img src="{{ gallery.image.url }}" height="150px" width="200px"></a></td>
+                        <td><a href="{{ gallery.picture_id }}"><img src="data:image;base64,{{ gallery.image | bin_2_img }}" height="150px" width="200px"></a></td>
+                        
+                    
                     </tr>
                     
                     {% endfor %}
                 </tbody>
             </table>
+
 
             <!-- 로그인 여부 확인 -->
 

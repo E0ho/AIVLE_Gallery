@@ -1,0 +1,4 @@
+.venv311
+*.pyc
+/media
+db_settings.py
