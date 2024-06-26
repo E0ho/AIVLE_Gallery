@@ -10,21 +10,167 @@ from GalleryUser.models import User
 from .forms import *
 
 
-def gallery_list(request):
-    gallery_list = Picture.objects.all()
-    context = {'gallery_li': gallery_list}
+# 메인 페이지 (홈 - 갤러리 리스트)
+def picture_list(request):
+
+    # 모든 갤러리 리스트 가져오기
+    picture_list = Picture.objects.all()
+
+    context = {
+        'picture_list': picture_list
+        }
+
+    # 홈 갤러리 (사진 게시글 리스트) 페이지 이동
     return render(request, 'gallery/gallery.html', context)
 
 
-def detail(request, picture_id):
-    if picture_id is not None:
-        picture = get_object_or_404(Picture, picture_id=picture_id)
-        image_data = base64.b64encode(picture.image).decode()
-        return render(request, "detail.html",
-                      {"picture": picture, 'img': image_data})
+
+# 상세 페이지
+def picture_detail(request, picture_id):
+    
+    # 특정 사진 정보 가져오기
+    picture = get_object_or_404(Picture, picture_id=picture_id)
+    image_data = base64.b64encode(picture.image).decode()
+    
+    context = {
+        'picture': picture, 
+        'img': image_data
+        }
+
+    # 사진 게시글 상세 페이지 이동
+    return render(request, "gallery/detail.html", context)
 
 
-def delete_post(request, picture_id):
+
+# 댓글 생성
+def create_comment(request, picture_id):
+
+    # 사진, 유저 정보 가져오기
+    picture = get_object_or_404(Picture, pk = picture_id)
+    user = get_object_or_404(User, pk = request.user)
+
+    # 댓글 생성
+    comment = Comment.objects.create(
+        user_id=user, 
+        picture_id=picture, 
+        content=request.POST.get('content'),
+        created_at=timezone.now()
+        )
+
+    # 해당 사진 게시글 이동
+    return redirect('gallery:detail', picture_id = picture.picture_id)
+
+
+
+# 댓글 변경 (미완성 같은데?)
+def update_comment(request, picture_id, comment_id):
+
+    # 댓글 가져오기
+    comment = get_object_or_404(Comment, pk=comment_id)
+
+    # 유저 확인
+    if request.user == comment.user_id:
+        pass
+
+    # 유저 불일치
+    else:
+        messages.warning(request, "권한이 없습니다.")                 # 경고 메세지
+
+        return redirect('gallery:detail', picture_id=picture_id)
+
+
+
+# 댓글 삭제
+def delete_comment(request, picture_id, comment_id):
+
+    # 댓글 정보 가져오기
+    comment = get_object_or_404(Comment, pk=comment_id)
+
+    # 유저 아이디 일치 확인 후 댓글 삭제
+    if request.user == comment.user_id:
+        comment.delete()
+
+
+    # 유저 아이디 불일치 (거절)
+    else:
+        messages.warning(request, "권한이 없습니다.")
+
+    # 사진 게시글 상세 페이지로 이동
+    return redirect('gallery:detail', picture_id=picture_id)
+
+
+
+# 좋아요 추가 기능
+def create_love(request, picture_id):
+
+    # 사진, 유저 정보 가져오기
+    picture = get_object_or_404(Picture, picture_id=picture_id)
+    user = get_object_or_404(User, pk=request.user)
+
+    # 해당 사진에 유저가 누른 좋아요 정보 가져오기
+    love = Love.objects.get(picture_id=picture, user_id=user)
+
+    # 좋아요 있음 (-> 삭제)
+    if love:
+        love.delete()
+
+    # 좋아요 없음 (-> 생성)
+    else:
+        love = Love.objects.create(
+            user_id=user, 
+            picture_id=picture, 
+            created_at=timezone.now()
+            )
+
+    # 상세 페이지로 이동
+    return redirect('gallery:detail', picture_id=picture.picture_id)
+
+
+
+# 사진 수정
+def update_picture(request, picture_id):
+
+    # 해당 사진 불러오기
+    picture = get_object_or_404(Picture, pk=picture_id)
+    image = picture.image              # 이미지 정보
+
+    # 유저 일치 확인
+    if request.user == picture.user_id:
+
+        # 데이터 전송 (POST 방식)
+        if request.method == 'POST':
+            form = ImageUploadForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                picture.title = form.cleaned_data['title']
+                picture.image = form.cleaned_data['image'].read()
+                picture.content = form.cleaned_data['content']
+                picture.user_id = request.user
+                picture.save()
+                return redirect('gallery:index')
+
+            else:
+                picture.title = form.cleaned_data['title']
+                picture.image = image
+                picture.content = form.cleaned_data['content']
+                picture.user_id = request.user
+                picture.save()
+                return redirect('gallery:index')
+        
+        # URL 접근 (GET 방식)
+        else:
+            form = ImageUploadForm(initial={'title': picture.title, 'content': picture.content, 'image': picture.image})
+            return render(request, 'update_post.html', {'form': form})
+    
+    # 유저 불일치
+    else:
+        messages.warning(request, "권한이 없습니다.")
+        return redirect('gallery:detail', picture_id=picture_id)
+
+
+
+
+def delete_picture(request, picture_id):
     picture = get_object_or_404(Picture, picture_id=picture_id)
     if request.user == picture.user_id:
         picture.delete()
@@ -34,72 +180,19 @@ def delete_post(request, picture_id):
         return redirect('gallery:detail', picture_id=picture_id)
 
 
-def update_post(request, picture_id):
-    picture = get_object_or_404(Picture, pk=picture_id)
-    image = picture.image
-    if request.user == picture.user_id:
-        if request.method == 'POST':
-            form = ImageUploadForm(request.POST, request.FILES)
-            if form.is_valid():
-                picture.title = form.cleaned_data['title']
-                picture.image = form.cleaned_data['image'].read()
-                picture.content = form.cleaned_data['content']
-                picture.user_id = request.user
-                picture.save()
-                return redirect('gallery:index')
-            else:
-                picture.title = form.cleaned_data['title']
-                picture.image = image
-                picture.content = form.cleaned_data['content']
-                picture.user_id = request.user
-                picture.save()
-                return redirect('gallery:index')
-        else:
-            form = ImageUploadForm(initial={'title': picture.title, 'content': picture.content, 'image': picture.image})
-            return render(request, 'update_post.html', {'form': form})
-    else:
-        messages.warning(request, "권한이 없습니다.")
-        return redirect('gallery:detail', picture_id=picture_id)
 
 
-def create_love(request, picture_id):
-    picture = get_object_or_404(Picture, picture_id=picture_id)
-    user = get_object_or_404(User, pk=request.user)
-    love = Love.objects.filter(user_id=user, picture_id=picture)
-    if love:
-        love.delete()
-    else:
-        love = Love(user_id=user, picture_id=picture, created_at=timezone.now())
-        love.save()
-    return redirect('gallery:detail', picture_id=picture.picture_id)
 
 
-def create_comment(request, picture_id):
-    picture = get_object_or_404(Picture, pk=picture_id)
-    user = get_object_or_404(User, pk=request.user)
-    comment = Comment(user_id=user, picture_id=picture, content=request.POST.get('content'),
-                      created_at=timezone.now())
-    comment.save()
-    return redirect('gallery:detail', picture_id=picture.picture_id)
 
 
-def delete_comment(request, comment_id, picture_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    if request.user == comment.user_id:
-        comment.delete()
-        return redirect('gallery:detail', picture_id=picture_id)
-    else:
-        messages.warning(request, "권한이 없습니다.")
-        return redirect('gallery:detail', picture_id=picture_id)
 
 
-def update_comment(request, comment_id, picture_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    if request.user == comment.user_id:
-        pass
-    else:
-        messages.warning(request, "권한이 없습니다.")
-        return redirect('gallery:detail', picture_id=picture_id)
+
+
+
+
+
 
 
 def new_register(request):
