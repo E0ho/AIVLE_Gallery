@@ -98,6 +98,7 @@
         }
     </style>
 </head>
+
 <body>
 <div class="container my-5">
     <h2 class="border-bottom py-3 text-center">{{ picture.title }}</h2>
@@ -128,7 +129,7 @@
                 <a href="{% url 'gallery:update' picture.picture_id %}" class="btn btn-secondary btn-sm">수정하기</a>
                 <a href="{% url 'gallery:delete' picture.picture_id %}" class="btn btn-danger btn-sm">삭제하기</a>
             </div>
-            <a href="{% url 'gallery:index' %}" class="btn btn-info btn-sm">목록보기</a>
+            <a href="{% url 'gallery:list' %}" class="btn btn-info btn-sm">목록보기</a>
         </div>
     </div>
 </div>
@@ -145,8 +146,8 @@
                     <li>
                         <span>{{ comment.content }}</span>
                         <div class="mt-2">
-                            <small><a href="{% url 'gallery:update_comment' picture.picture_id comment.comment_id %}">[댓글 수정]</a></small>
-                            <small><a href="{% url 'gallery:delete_comment' picture.picture_id comment.comment_id %}">[댓글 삭제]</a></small>
+                            <small><a href="{% url 'gallery:update_comment' picture_id=picture.picture_id comment_id=comment.comment_id %}">[댓글 수정]</a></small>
+                            <small><a href="{% url 'gallery:delete_comment' picture_id=picture.picture_id comment_id=comment.comment_id %}">[댓글 삭제]</a></small>
                         </div>
                     </li>
                 {% endfor %}

@@ -124,6 +124,7 @@
         }
     </style>
 </head>
+
 <body>
 <div class="container my-5">
     <h2 class="border-bottom py-3 text-center">{{ picture.title }}</h2>
@@ -155,7 +156,7 @@
                 <a href="{% url 'gallery:update' picture.picture_id %}" class="btn btn-secondary btn-sm">수정하기</a>
                 <a href="{% url 'gallery:delete' picture.picture_id %}" class="btn btn-danger btn-sm">삭제하기</a>
             </div>
-            <a href="{% url 'gallery:index' %}" class="btn btn-info btn-sm">목록보기</a>
+            <a href="{% url 'gallery:list' %}" class="btn btn-info btn-sm">목록보기</a>
         </div>
     </div>
 </div>
@@ -171,7 +172,7 @@
                 {% for co in picture.comment_set.all %}
                 <li>
                 {% if co.comment_id == comment.comment_id %}
-                <form class="comment-form mt-4" action="{% url 'gallery:update_comment' picture.picture_id comment.comment_id  %}" method="post">
+                <form class="comment-form mt-4" action="{% url 'gallery:update_comment' picture_id=picture.picture_id comment_id=comment.comment_id  %}" method="post">
                     {% csrf_token %}
                     <textarea name="content" id="content" rows="5" class="form-control mb-3">{{ comment.content }}</textarea>
                     <button type="submit" class="btn btn-primary">댓글 수정</button>

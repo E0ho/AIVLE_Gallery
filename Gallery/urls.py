@@ -1,36 +1,39 @@
-"""
-URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import path
 from Gallery import views
+
 
 app_name = 'gallery'
 
+
 urlpatterns = [
-    path('', views.gallery_list, name='index'),
-    path('<int:picture_id>/', views.detail, name='detail'),
-    path('comment/create/<int:picture_id>/', views.create_comment, name='create_comment'),
-    path('comment/update/<int:picture_id>/<int:comment_id>', views.update_comment, name='update_comment'),
-    path('comment/delete/<int:picture_id>/<int:comment_id>/', views.delete_comment, name='delete_comment'),
-    path('love/create/<int:picture_id>/', views.create_love, name='create_love'),
-    path('<int:picture_id>/update/', views.update_post, name='update'),
-    path('<int:picture_id>/delete/', views.delete_post, name='delete'),
+
+    # 기본 URL
+    path('', views.picture_list, name='list'),                         # 메인 페이지
+    path('<int:picture_id>/', views.picture_detail, name='detail'),    # 상세 페이지
+
+    # Comment 관련 URL
+    path('<int:picture_id>/create_comment/', views.create_comment, name='create_comment'),                     # 댓글 생성
+    path('<int:picture_id>/<int:comment_id>/update_comment/', views.update_comment, name='update_comment'),    # 댓글 수정
+    path('<int:picture_id>/<int:comment_id>/delete_comment/', views.delete_comment, name='delete_comment'),    # 댓글 삭제
+
+    # Love 관련 URL
+    path('<int:picture_id>/create_love/', views.create_love, name='create_love'),     # 좋아요 (추가 <-> 제거)
+
+
+###########################################################################################################################
+
+    # Picture 관련 URL
+    path('<int:picture_id>/update_picture/', views.update_picture, name='update'),
+    path('<int:picture_id>/delete_picture/', views.delete_picture, name='delete'),
+
+
     path('new_register/', views.new_register, name='new_register'),
-    path('create/', views.create, name='create'),
+    # path('create/', views.create, name='create'),
     path('search/', views.search, name='search'),
 ]
+
+
+# Media 폴더 저장 경로 설정
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
